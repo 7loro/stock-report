@@ -1,0 +1,49 @@
+[project]
+name = "stock-screening"
+version = "0.1.0"
+description = "주식 스크리닝 자동화 시스템"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "sqlmodel>=0.0.22",
+    "pykrx>=1.0.45",
+    "pandas>=2.2.0",
+    "apscheduler>=3.10.0",
+    "python-telegram-bot>=21.0",
+    "pydantic-settings>=2.6.0",
+    "httpx>=0.27.0",
+    "setuptools<81",
+    "finance-datareader>=0.9.102",
+    "html5lib>=1.1",
+    "lxml>=6.0.2",
+    "pyarrow>=23.0.0",
+    "google-genai>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.24.0",
+    "httpx>=0.27.0",
+]
+ai-openai = ["openai>=1.0.0"]
+ai-claude = ["anthropic>=0.40.0", "tavily-python>=0.5.0"]
+ai-gemini = ["google-genai>=1.0.0"]
+ai-all = [
+    "openai>=1.0.0",
+    "anthropic>=0.40.0",
+    "tavily-python>=0.5.0",
+    "google-genai>=1.0.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/screening"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"

@@ -1,0 +1,96 @@
+name: Daily Report
+
+on:
+  schedule:
+    # UTC 10:00 = KST 19:00 (평일만)
+    - cron: '0 10 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      date:
+        description: '리포트 날짜 (YYYY-MM-DD, 비어있으면 오늘)'
+        required: false
+        type: string
+      telegram:
+        description: '텔레그램 발송'
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Restore pip cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/uv
+          key: uv-${{ runner.os }}-${{ hashFiles('backend/uv.lock') }}
+          restore-keys: uv-${{ runner.os }}-
+
+      - name: Install dependencies
+        working-directory: backend
+        run: uv sync
+
+      - name: Restore DB cache
+        uses: actions/cache@v4
+        with:
+          path: backend/data/screening.db
+          key: screening-db-${{ github.run_id }}
+          restore-keys: screening-db-
+
+      - name: Generate static site
+        working-directory: backend
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+        run: |
+          ARGS="--output-dir ../site"
+
+          # 날짜 지정 (workflow_dispatch)
+          if [ -n "${{ inputs.date }}" ]; then
+            ARGS="$ARGS --date ${{ inputs.date }}"
+          fi
+
+          # 텔레그램 발송
+          if [ "${{ inputs.telegram }}" = "true" ] || [ "${{ github.event_name }}" = "schedule" ]; then
+            ARGS="$ARGS --telegram"
+          fi
+
+          uv run python -m scripts.generate_site $ARGS
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: generate
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

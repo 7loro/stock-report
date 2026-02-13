@@ -1,0 +1,23 @@
+# 정적 사이트 생성 결과 (로컬)
+site/
+
+# 민감 정보
+backend/settings.toml
+
+# DB
+backend/data/*.db
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
