@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>장 마감 리포트 · 2026-02-28</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  .tabular-nums { font-variant-numeric: tabular-nums; }
+  .help-tip { position: relative; display: inline-flex; }
+  .help-tip .tip-body {
+    display: none; position: absolute; left: 50%; top: calc(100% + 6px);
+    transform: translateX(-50%); z-index: 50; width: max-content; max-width: 340px;
+    padding: 10px 14px; border-radius: 8px;
+    background: #1e293b; border: 1px solid #334155; color: #cbd5e1;
+    font-size: 13px; font-weight: normal; line-height: 1.5;
+    white-space: normal; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,.4);
+  }
+  .help-tip:hover .tip-body { display: block; }
+  details[open] .funnel-arrow { transform: rotate(90deg); }
+  @media (max-width: 767px) {
+    .help-tip .tip-body { left: 0; right: auto; transform: none; max-width: calc(100vw - 2rem); }
+    .stock-row button { min-height: 44px; }
+  }
+</style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+<div class="max-w-5xl mx-auto px-3 md:px-4 py-4 md:py-8">
+
+  <header class="mb-8">
+    <h1 class="text-2xl font-bold">장 마감 리포트</h1>
+    <p class="text-gray-400 mt-1">
+      2026-02-28 (토)
+      <span class="text-gray-600 ml-2">생성: 16:04</span>
+    </p>
+    <div class="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-sm text-gray-400">
+      <span>스크리닝 0건</span>
+      <span>상승 업종 0/0개</span>
+    </div>
+  </header>
+
+  <!-- 스크리닝 결과 -->
+  <section class="mb-10">
+    <h2 class="text-lg font-bold mb-3 pb-2 border-b border-gray-700 flex items-center gap-2">
+      스크리닝 종목
+      <span class="text-sm font-normal text-gray-400">0개</span>
+      <span class="help-tip">
+        <span class="inline-flex items-center justify-center w-5 h-5 rounded-full
+          bg-gray-700 text-gray-400 text-xs cursor-help hover:bg-gray-600
+          hover:text-gray-200 transition-colors">?</span>
+        <span class="tip-body">
+          다단계 필터를 모두 통과한 종목입니다.<br>
+          <b>1차</b> 가격 상승 + 양봉 + 최소 거래량<br>
+          <b>2차</b> 거래량 정밀 + 이동평균선 추세(SMA) + 골든크로스<br>
+          <b>3차</b> 수급 (프로그램 순매수 &gt; 0 OR 외국인+기관 순매수)<br>
+          <b>4차</b> 실적 (YoY/QoQ 영업이익 증가 + 적자전환 없음)
+        </span>
+      </span>
+    </h2>
+    
+    <div class="text-center py-10 text-gray-500"><p class="text-lg mb-1">스크리닝 결과 없음</p><p class="text-sm">오늘 조건을 통과한 종목이 없습니다.</p></div>
+  </section>
+
+  <!-- 상승 섹터 · 종목 · 뉴스 -->
+  <section>
+    <h2 class="text-lg font-bold mb-3 pb-2 border-b border-gray-700 flex items-center gap-2">
+      상승 섹터 · 종목 · 뉴스
+      <span class="text-sm font-normal text-gray-400">상위 10개</span>
+      <span class="help-tip">
+        <span class="inline-flex items-center justify-center w-5 h-5 rounded-full
+          bg-gray-700 text-gray-400 text-xs cursor-help hover:bg-gray-600
+          hover:text-gray-200 transition-colors">?</span>
+        <span class="tip-body">
+          당일 평균 등락률 기준 상승 섹터 상위 10개와,<br>
+          각 섹터 내 등락률 상위 종목을 보여줍니다.<br>
+          뉴스 요약은 Naver Finance 종목 뉴스를<br>
+          AI가 요약한 결과입니다.
+        </span>
+      </span>
+    </h2>
+    <p class="text-gray-500">섹터·종목 분석 결과 없음</p>
+  </section>
+
+  <footer class="mt-12 text-center text-gray-600 text-xs">
+    본 리포트는 투자 참고용이며, 투자 권유 목적이 아닙니다. 모든 투자의 책임은 본인에게 있습니다.
+  </footer>
+
+</div>
+<script>
+function toggleSrc(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('hidden');
+}
+function toggleSector(idx) {
+  const detail = document.getElementById('detail-' + idx);
+  const arrow = document.getElementById('arrow-' + idx);
+  if (!detail) return;
+  const isHidden = detail.classList.toggle('hidden');
+  if (arrow) arrow.style.transform = isHidden ? '' : 'rotate(90deg)';
+}
+function scrollToSector(idx) {
+  const el = document.getElementById('sector-' + idx);
+  if (!el) return;
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const detail = document.getElementById('detail-' + idx);
+  const arrow = document.getElementById('arrow-' + idx);
+  if (detail && detail.classList.contains('hidden')) {
+    detail.classList.remove('hidden');
+    if (arrow) arrow.style.transform = 'rotate(90deg)';
+  }
+}
+function toggleStock(idx) {
+  const detail = document.getElementById('stock-detail-' + idx);
+  if (!detail) return;
+  const isHidden = detail.classList.toggle('hidden');
+  const row = detail.closest('.stock-row');
+  if (row) row.querySelectorAll('.stock-arrow').forEach(function(a) {
+    a.style.transform = isHidden ? '' : 'rotate(90deg)';
+  });
+}
+function toggleAllStocks() {
+  const btn = document.getElementById('stock-toggle-all');
+  const rows = document.querySelectorAll('.stock-row:not([style*="display: none"])');
+  const details = [];
+  rows.forEach(function(row) {
+    const d = row.querySelector('[id^="stock-detail-"]');
+    if (d) details.push(d);
+  });
+  const anyVisible = details.some(function(d) { return !d.classList.contains('hidden'); });
+  rows.forEach(function(row) {
+    const d = row.querySelector('[id^="stock-detail-"]');
+    if (d) {
+      if (anyVisible) d.classList.add('hidden');
+      else d.classList.remove('hidden');
+    }
+    row.querySelectorAll('.stock-arrow').forEach(function(a) {
+      a.style.transform = anyVisible ? '' : 'rotate(90deg)';
+    });
+  });
+  if (btn) btn.textContent = anyVisible ? '전체 펼치기' : '전체 접기';
+}
+function setScreenFilter(mode) {
+  const rows = document.querySelectorAll('.stock-row');
+  const tabSupply = document.getElementById('tab-supply');
+  const tabFinal = document.getElementById('tab-final');
+  const emptyEl = document.getElementById('screen-empty');
+  const activeClass = 'border-cyan-500/50 bg-cyan-500/10 text-cyan-400';
+  const inactiveClass = 'border-gray-700 text-gray-500 hover:text-gray-300';
+  let visibleCount = 0;
+  rows.forEach(row => {
+    if (mode === 'final') {
+      const passed = row.getAttribute('data-financial-passed') === 'true';
+      row.style.display = passed ? '' : 'none';
+      if (passed) visibleCount++;
+    } else {
+      row.style.display = '';
+      visibleCount++;
+    }
+  });
+  // 탭 활성 상태 전환
+  const base = 'screening-tab text-xs px-3 py-1.5 rounded-full border transition-colors';
+  if (tabSupply && tabFinal) {
+    if (mode === 'supply') {
+      tabSupply.className = base + ' ' + activeClass;
+      tabFinal.className = base + ' ' + inactiveClass;
+    } else {
+      tabFinal.className = base + ' ' + activeClass;
+      tabSupply.className = base + ' ' + inactiveClass;
+    }
+  }
+  // 빈 상태 메시지
+  if (emptyEl) {
+    emptyEl.classList.toggle('hidden', visibleCount > 0);
+  }
+  // 전체 펼치기/접기 버튼 리셋
+  const btn = document.getElementById('stock-toggle-all');
+  if (btn) btn.textContent = '전체 펼치기';
+  rows.forEach(function(row) {
+    const d = row.querySelector('[id^="stock-detail-"]');
+    if (d) d.classList.add('hidden');
+    row.querySelectorAll('.stock-arrow').forEach(function(a) {
+      a.style.transform = '';
+    });
+  });
+}
+</script>
+</body>
+</html>
